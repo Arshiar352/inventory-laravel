@@ -1,15 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/products', function () {
-    return 'Products Page.';
-})->name('products.index');
+Route::get('/products', [ProductController::class, 'index'])
+    ->name('products.index');
 
-Route::get('/products/{id}', function ($id) {
-    return 'Product ID: ' . $id;
-})->name('products.show');
+Route::get('/products/{id}', [ProductController::class, 'show'])
+    ->whereNumber('id')
+    ->name('products.show');
