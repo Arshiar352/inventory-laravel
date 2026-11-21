@@ -37,4 +37,19 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('success', 'محصول با موفقیت ثبت شد.');
     }
+
+    public function create()
+    {
+        return view('products.create');
+    }
+
+    public function delete()
+    {
+        //
+    }
+
+    public function update()
+    {
+        //
+    }
 }
