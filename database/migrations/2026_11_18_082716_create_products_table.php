@@ -10,13 +10,11 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-
             $table->string('name');
             $table->decimal('price', 12, 2);
             $table->unsignedInteger('quantity');
             $table->string('manufacturer');
             $table->string('type');
-
             $table->timestamps();
         });
     }
