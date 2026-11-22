@@ -7,17 +7,33 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $search = $request->input('search');
+
+        $products = Product::query();
+
+        if ($search) {
+            $products->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('manufacturer', 'LIKE', '%' . $search . '%')
+                    ->orWhere('type', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        $products = $products->get();
 
         return view('products.index', compact('products'));
     }
 
     public function show($id)
     {
-
         return 'Product ID: ' . $id;
+    }
+
+    public function create()
+    {
+        return view('products.create');
     }
 
     public function store(Request $request)
@@ -37,21 +53,22 @@ class ProductController extends Controller
             ->with('success', 'محصول با موفقیت ثبت شد.');
     }
 
-    public function create()
+    public function edit($id)
     {
-        return view('products.create');
-    }
+        $product = Product::find($id);
 
-    public function delete()
-    {
-        //
+        if (! $product) {
+            abort(404);
+        }
+
+        return view('products.edit', compact('product'));
     }
 
     public function update(Request $request, $id)
     {
         $product = Product::find($id);
 
-        if (!$product) {
+        if (! $product) {
             abort(404);
         }
 
@@ -62,21 +79,26 @@ class ProductController extends Controller
             'manufacturer' => 'required',
             'type' => 'required',
         ]);
+
         $product->update($validated);
 
         return redirect()
             ->route('products.index')
-            ->with('success', 'محصول با موفقیت تغییر کرد.');
+            ->with('success', 'محصول با موفقیت ویرایش شد.');
     }
 
-    public function edit($id)
+    public function destroy($id)
     {
         $product = Product::find($id);
 
-        if (!$product) {
+        if (! $product) {
             abort(404);
         }
 
-        return view('products.edit', compact('product'));
+        $product->delete();
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'محصول با موفقیت حذف شد.');
     }
 }

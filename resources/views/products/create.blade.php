@@ -10,6 +10,10 @@
 
     <h1>ثبت محصول جدید</h1>
 
+    <a href="{{ route('products.index') }}">بازگشت به لیست محصولات</a>
+
+    <br><br>
+
     @if ($errors->any())
     <ul>
         @foreach ($errors->all() as $error)
@@ -23,23 +27,27 @@
         @csrf
 
         <label>نام محصول:</label>
-        <input type="text" name="name">
+        <input type="text" name="name" value="{{ old('name') }}">
         <br><br>
 
         <label>قیمت:</label>
-        <input type="number" name="price">
+        <input type="number" name="price" min="0" step="0.01"
+            value="{{ old('price') }}">
         <br><br>
 
         <label>تعداد:</label>
-        <input type="number" name="quantity">
+        <input type="number" name="quantity" min="0" step="1"
+            value="{{ old('quantity') }}">
         <br><br>
 
         <label>سازنده:</label>
-        <input type="text" name="manufacturer">
+        <input type="text" name="manufacturer"
+            value="{{ old('manufacturer') }}">
         <br><br>
 
         <label>نوع محصول:</label>
-        <input type="text" name="type">
+        <input type="text" name="type"
+            value="{{ old('type') }}">
         <br><br>
 
         <button type="submit">ثبت محصول</button>
