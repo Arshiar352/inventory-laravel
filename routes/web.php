@@ -24,6 +24,6 @@ Route::get('/products/{id}/edit', [ProductController::class, 'edit'])
     ->whereNumber('id')
     ->name('products.edit');
 
-Route::put('/porducts/{id}/update', [ProductController::class, 'udpate'])
+Route::put('/products/{id}/update', [ProductController::class, 'update'])
     ->whereNumber('id')
-    ->name('product.update');
+    ->name('products.update');

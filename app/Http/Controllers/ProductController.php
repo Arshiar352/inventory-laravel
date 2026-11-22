@@ -65,7 +65,7 @@ class ProductController extends Controller
         $product->update($validated);
 
         return redirect()
-            ->route('products.update')
+            ->route('products.index')
             ->with('success', 'محصول با موفقیت تغییر کرد.');
     }
 
