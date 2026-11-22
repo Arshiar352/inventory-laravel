@@ -23,3 +23,7 @@ Route::get('/products/create', [ProductController::class, 'create'])
 Route::get('/products/{id}/edit', [ProductController::class, 'edit'])
     ->whereNumber('id')
     ->name('products.edit');
+
+Route::put('/porducts/{id}/update', [ProductController::class, 'udpate'])
+    ->whereNumber('id')
+    ->name('product.update');

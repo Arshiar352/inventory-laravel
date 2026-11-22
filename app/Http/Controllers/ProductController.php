@@ -47,9 +47,26 @@ class ProductController extends Controller
         //
     }
 
-    public function update()
+    public function update(Request $request, $id)
     {
-        //
+        $product = Product::find($id);
+
+        if (!$product) {
+            abort(404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
+            'manufacturer' => 'required',
+            'type' => 'required',
+        ]);
+        $product->update($validated);
+
+        return redirect()
+            ->route('products.update')
+            ->with('success', 'محصول با موفقیت تغییر کرد.');
     }
 
     public function edit($id)
