@@ -11,13 +11,12 @@ class ProductController extends Controller
     {
         $products = Product::all();
 
-        $productsCount = $products->sum('quantity');
-
         return view('products.index', compact('products'));
     }
 
     public function show($id)
     {
+
         return 'Product ID: ' . $id;
     }
 
@@ -51,5 +50,16 @@ class ProductController extends Controller
     public function update()
     {
         //
+    }
+
+    public function edit($id)
+    {
+        $product = Product::find($id);
+
+        if (!$product) {
+            abort(404);
+        }
+
+        return view('products.edit', compact('product'));
     }
 }
