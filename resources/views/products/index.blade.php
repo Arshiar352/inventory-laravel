@@ -47,21 +47,21 @@
             @forelse ($products as $product)
 
             <tr>
-                <td>{{ $product->name }}</td>
-                <td>{{ $product->price }}</td>
-                <td>{{ $product->quantity }}</td>
-                <td>{{ $product->manufacturer }}</td>
-                <td>{{ $product->type }}</td>
+                <td>{{ $product['name'] }}</td>
+                <td>{{ $product['price'] }}</td>
+                <td>{{ $product['quantity'] }}</td>
+                <td>{{ $product['manufacturer'] }}</td>
+                <td>{{ $product['type'] }}</td>
 
                 <td>
-                    <a href="{{ route('products.edit', $product->id) }}">
+                    <a href="{{ route('products.edit', $product['id']) }}">
                         ویرایش
                     </a>
 
                     |
 
                     <form
-                        action="{{ route('products.destroy', $product->id) }}"
+                        action="{{ route('products.destroy', $product['id']) }}"
                         method="POST"
                         style="display: inline;"
                         onsubmit="return confirm('آیا از حذف این محصول مطمئن هستید؟')">
