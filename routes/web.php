@@ -7,12 +7,13 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Route::middleware('guest')->group(
     function () {
+
+        Route::get('/', [AuthController::class, 'showLogin'])
+            ->name('login');
 
         Route::get('/login', [AuthController::class, 'showLogin'])
             ->name('login');
@@ -22,6 +23,9 @@ Route::middleware('guest')->group(
 
         Route::post('/register', [AuthController::class, 'register'])
             ->name('register.create');
+
+        Route::post('/login', [AuthController::class, 'login'])
+            ->name('login.submit');
     }
 );
 
@@ -61,5 +65,8 @@ Route::middleware('auth')->group(
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])
             ->whereNumber('id')
             ->name('products.destroy');
+
+        Route::put('/profile', [UserController::class, 'updateProfile'])
+            ->name('profile.update');
     }
 );

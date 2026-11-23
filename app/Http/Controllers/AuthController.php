@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,14 +13,17 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-
         $validated = $request->validate([
-            'username' => 'unique:users,username|required',
-            'email' => 'required|unique:users,email|email',
+            'username' => 'required|unique:users,username',
+            'email' => 'required|email|unique:users,email',
             'mobile' => 'required|digits:11|unique:users,mobile',
-            'birth_date' => 'required|date',
+            'birth_date' => 'required|jdate:Y/m/d',
             'password' => 'required|confirmed|min:8',
         ]);
+
+        $validated['birth_date'] = Verta::parse(
+            $validated['birth_date']
+        )->toCarbon()->format('Y-m-d');
 
         User::create($validated);
 
@@ -30,18 +34,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'login' => 'required',
             'password' => 'required',
         ]);
 
-        $login = $request->input('login');
-        $password = $request->input('password');
-
+        $login = $validated['login'];
+        $password = $validated['password'];
 
         if (str_contains($login, '@')) {
             $field = 'email';
-        } elseif (is_numeric($login)) {
+        } elseif (ctype_digit($login) && strlen($login) === 11) {
             $field = 'mobile';
         } else {
             $field = 'username';
@@ -58,13 +61,13 @@ class AuthController extends Controller
             return redirect()
                 ->route('home')
                 ->with('success', 'خوش آمدید.');
-        } else {
-            return redirect()
-                ->route('login')
-                ->withErrors([
-                    'login' => 'ایمیل، شماره موبایل، نام کاربری یا رمز عبور اشتباه است.',
-                ]);
         }
+
+        return back()
+            ->withErrors([
+                'login' => 'اطلاعات ورود اشتباه است.',
+            ])
+            ->onlyInput('login');
     }
 
     public function logout(Request $request)
