@@ -8,65 +8,60 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 
+Route::middleware('guest')->group(function () {
 
-Route::middleware('guest')->group(
-    function () {
+    Route::redirect('/', '/login');
 
-        Route::get('/', [AuthController::class, 'showLogin'])
-            ->name('login');
+    Route::get('/login', [AuthController::class, 'showLogin'])
+        ->name('login');
 
-        Route::get('/login', [AuthController::class, 'showLogin'])
-            ->name('login');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->name('login.submit');
 
-        Route::get('/register', [AuthController::class, 'showRegister'])
-            ->name('register.show');
+    Route::get('/register', [AuthController::class, 'showRegister'])
+        ->name('register.show');
 
-        Route::post('/register', [AuthController::class, 'register'])
-            ->name('register.create');
+    Route::post('/register', [AuthController::class, 'register'])
+        ->name('register.create');
+});
 
-        Route::post('/login', [AuthController::class, 'login'])
-            ->name('login.submit');
-    }
-);
 
-Route::middleware('auth')->group(
-    function () {
+Route::middleware('auth')->group(function () {
 
-        Route::get('/home', [HomeController::class, 'index'])
-            ->name('home');
+    Route::get('/home', [HomeController::class, 'index'])
+        ->name('home');
 
-        Route::get('/profile', [UserController::class, 'profile'])
-            ->name('profile');
+    Route::get('/profile', [UserController::class, 'profile'])
+        ->name('profile');
 
-        Route::post('/logout', [AuthController::class, 'logout'])
-            ->name('logout');
+    Route::put('/profile', [UserController::class, 'updateProfile'])
+        ->name('profile.update');
 
-        Route::get('/products', [ProductController::class, 'index'])
-            ->name('products.index');
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
 
-        Route::get('/products/create', [ProductController::class, 'create'])
-            ->name('products.create');
+    Route::get('/products', [ProductController::class, 'index'])
+        ->name('products.index');
 
-        Route::post('/products', [ProductController::class, 'store'])
-            ->name('products.store');
+    Route::get('/products/create', [ProductController::class, 'create'])
+        ->name('products.create');
 
-        Route::get('/products/{id}/edit', [ProductController::class, 'edit'])
-            ->whereNumber('id')
-            ->name('products.edit');
+    Route::post('/products', [ProductController::class, 'store'])
+        ->name('products.store');
 
-        Route::put('/products/{id}', [ProductController::class, 'update'])
-            ->whereNumber('id')
-            ->name('products.update');
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit'])
+        ->whereNumber('id')
+        ->name('products.edit');
 
-        Route::get('/products/{id}', [ProductController::class, 'show'])
-            ->whereNumber('id')
-            ->name('products.show');
+    Route::put('/products/{id}', [ProductController::class, 'update'])
+        ->whereNumber('id')
+        ->name('products.update');
 
-        Route::delete('/products/{id}', [ProductController::class, 'destroy'])
-            ->whereNumber('id')
-            ->name('products.destroy');
+    Route::get('/products/{id}', [ProductController::class, 'show'])
+        ->whereNumber('id')
+        ->name('products.show');
 
-        Route::put('/profile', [UserController::class, 'updateProfile'])
-            ->name('profile.update');
-    }
-);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])
+        ->whereNumber('id')
+        ->name('products.destroy');
+});
