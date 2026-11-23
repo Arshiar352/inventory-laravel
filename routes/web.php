@@ -1,6 +1,7 @@
 
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,27 +9,52 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/products', [ProductController::class, 'index'])
-    ->name('products.index');
+Route::middleware('guest')->group(
+    function () {
 
-Route::get('/products/create', [ProductController::class, 'create'])
-    ->name('products.create');
+        Route::get('/login', [AuthController::class, 'showLogin'])
+            ->name('login');
 
-Route::post('/products', [ProductController::class, 'store'])
-    ->name('products.store');
+        Route::get('/register', [AuthController::class, 'showRegister'])
+            ->name('register.show');
 
-Route::get('/products/{id}/edit', [ProductController::class, 'edit'])
-    ->whereNumber('id')
-    ->name('products.edit');
+        Route::post('/register', [AuthController::class, 'register'])
+            ->name('register.create');
+    }
+);
 
-Route::put('/products/{id}', [ProductController::class, 'update'])
-    ->whereNumber('id')
-    ->name('products.update');
+Route::middleware('auth')->group(
+    function () {
 
-Route::get('/products/{id}', [ProductController::class, 'show'])
-    ->whereNumber('id')
-    ->name('products.show');
+        Route::get('/home',);
 
-Route::delete('/products/{id}', [ProductController::class, 'destroy'])
-    ->whereNumber('id')
-    ->name('products.destroy');
+        Route::get('/profile',);
+
+        Route::post('/logout',);
+
+        Route::get('/products', [ProductController::class, 'index'])
+            ->name('products.index');
+
+        Route::get('/products/create', [ProductController::class, 'create'])
+            ->name('products.create');
+
+        Route::post('/products', [ProductController::class, 'store'])
+            ->name('products.store');
+
+        Route::get('/products/{id}/edit', [ProductController::class, 'edit'])
+            ->whereNumber('id')
+            ->name('products.edit');
+
+        Route::put('/products/{id}', [ProductController::class, 'update'])
+            ->whereNumber('id')
+            ->name('products.update');
+
+        Route::get('/products/{id}', [ProductController::class, 'show'])
+            ->whereNumber('id')
+            ->name('products.show');
+
+        Route::delete('/products/{id}', [ProductController::class, 'destroy'])
+            ->whereNumber('id')
+            ->name('products.destroy');
+    }
+);
