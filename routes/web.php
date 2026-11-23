@@ -26,11 +26,14 @@ Route::middleware('guest')->group(
 Route::middleware('auth')->group(
     function () {
 
-        Route::get('/home',);
+        Route::get('/home', [HomeController::class, 'index'])
+            ->name('home');
 
-        Route::get('/profile',);
+        Route::get('/profile', [UserController::class, 'profile'])
+            ->name('profile');
 
-        Route::post('/logout',);
+        Route::post('/logout', [AuthController::class, 'logout'])
+            ->name('logout');
 
         Route::get('/products', [ProductController::class, 'index'])
             ->name('products.index');
