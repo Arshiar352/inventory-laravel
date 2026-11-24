@@ -10,46 +10,33 @@ class ProductController extends Controller
 {
 
 
-    private function getCacheVersion()
-    {
-        return Cache::get('products_cache_version', 1);
-    }
-
-
-    private function clearProductsCache()
-    {
-        $version = $this->getCacheVersion();
-
-        Cache::forever('products_cache_version', $version + 1);
-    }
-
-
     public function index(Request $request)
     {
         $search = trim($request->input('search', ''));
 
-        $version = $this->getCacheVersion();
+        $cacheKey = 'products_' . md5($search ?: 'all');
 
-        $cacheKey = 'products_array_v' . $version . '_' . md5($search ?: 'all');
+        $products = Cache::tags(['product'])->remember(
+            $cacheKey,
+            now()->addMinutes(5),
+            function () use ($search) {
 
-        $products = Cache::rememberForever($cacheKey, function () use ($search) {
+                $query = Product::query();
 
-            $query = Product::query();
+                if ($search !== '') {
+                    $query->where(function ($query) use ($search) {
+                        $query->where('name', 'LIKE', '%' . $search . '%')
+                            ->orWhere('manufacturer', 'LIKE', '%' . $search . '%')
+                            ->orWhere('type', 'LIKE', '%' . $search . '%');
+                    });
+                }
 
-            if ($search !== '') {
-                $query->where(function ($query) use ($search) {
-                    $query->where('name', 'LIKE', '%' . $search . '%')
-                        ->orWhere('manufacturer', 'LIKE', '%' . $search . '%')
-                        ->orWhere('type', 'LIKE', '%' . $search . '%');
-                });
+                return $query->get()->toArray();
             }
-
-            return $query->get()->toArray();
-        });
+        );
 
         return view('products.index', compact('products'));
     }
-
 
     public function show(int $id)
     {
@@ -76,8 +63,7 @@ class ProductController extends Controller
         ]);
 
         Product::create($validated);
-
-        $this->clearProductsCache();
+        Cache::tags(['product'])->flush();
 
         return redirect()
             ->route('products.index')
@@ -116,8 +102,7 @@ class ProductController extends Controller
         ]);
 
         $product->update($validated);
-
-        $this->clearProductsCache();
+        Cache::tags(['product'])->flush();
 
         return redirect()
             ->route('products.index')
@@ -135,8 +120,7 @@ class ProductController extends Controller
         }
 
         $product->delete();
-
-        $this->clearProductsCache();
+        Cache::tags(['product'])->flush();
 
         return redirect()
             ->route('products.index')
