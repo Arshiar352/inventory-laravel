@@ -11,4 +11,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('app:update-products-quantity')->everyMinute();
+Schedule::command('app:update-products-quantity')->everyThirtySeconds();
+Schedule::command('app:empty-products')->everyMinute();
