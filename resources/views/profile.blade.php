@@ -1,86 +1,57 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پروفایل کاربر</title>
-</head>
+@section('title', 'پروفایل کاربر')
 
-<body>
+@section('content')
+    <div class="card">
+        <div class="card-header">پروفایل من</div>
 
-    <h1>پروفایل من</h1>
+        <div class="card-body p-4">
+            @if ($user->profile_picture)
+                <div class="mb-4">
+                    <img src="{{ asset('storage/' . $user->profile_picture) }}" width="120"
+                        class="rounded-circle" alt="عکس پروفایل">
+                </div>
+            @endif
 
-    @if (session('success'))
-    <p>{{ session('success') }}</p>
-    @endif
+            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
 
-    @if ($errors->any())
-    @foreach ($errors->all() as $error)
-    <p>{{ $error }}</p>
-    @endforeach
-    @endif
+                <div class="mb-3">
+                    <label for="username" class="form-label">نام کاربری</label>
+                    <input id="username" type="text" name="username" class="form-control"
+                        value="{{ old('username', $user->username) }}" required>
+                </div>
 
-    @if ($user->profile_picture)
-    <img
-        src="{{ asset('storage/' . $user->profile_picture) }}"
-        width="120"
-        alt="عکس پروفایل">
-    @endif
+                <div class="mb-3">
+                    <label for="email" class="form-label">ایمیل</label>
+                    <input id="email" type="email" class="form-control" value="{{ $user->email }}" disabled>
+                </div>
 
-    <form action="{{ route('profile.update') }}"
-        method="POST"
-        enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="mobile" class="form-label">موبایل</label>
+                    <input id="mobile" type="text" class="form-control" value="{{ $user->mobile }}" disabled>
+                </div>
 
-        @csrf
-        @method('PUT')
+                <div class="mb-3">
+                    <label for="birth_date" class="form-label">تاریخ تولد</label>
+                    <input id="birth_date" type="text" name="birth_date" class="form-control"
+                        value="{{ old('birth_date', $birthDate) }}" placeholder="1400/05/20" required>
+                    <div class="form-text">سن: {{ $age }} سال</div>
+                </div>
 
-        <div>
-            <label>نام کاربری</label>
-            <input
-                type="text"
-                name="username"
-                value="{{ old('username', $user->username) }}"
-                required>
+                <div class="mb-4">
+                    <label for="profile_picture" class="form-label">عکس پروفایل</label>
+                    <input id="profile_picture" type="file" name="profile_picture"
+                        class="form-control" accept="image/*">
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+                    <a href="{{ route('home') }}" class="btn btn-outline-light">بازگشت به خانه</a>
+                </div>
+            </form>
         </div>
-
-        <div>
-            <label>ایمیل</label>
-            <input type="email" value="{{ $user->email }}" disabled>
-        </div>
-
-        <div>
-            <label>موبایل</label>
-            <input type="text" value="{{ $user->mobile }}" disabled>
-        </div>
-
-        <div>
-            <label>تاریخ تولد</label>
-            <input
-                type="text"
-                name="birth_date"
-                value="{{ old('birth_date', $birthDate) }}"
-                placeholder="1400/05/20"
-                required>
-        </div>
-        <div>
-            <label>سن:</label>
-            <span>{{ $age }} سال</span>
-        </div>
-
-        <div>
-            <label>عکس پروفایل</label>
-            <input
-                type="file"
-                name="profile_picture"
-                accept="image/*">
-        </div>
-
-        <button type="submit">ذخیره تغییرات</button>
-    </form>
-
-    <a href="{{ route('home') }}">بازگشت به خانه</a>
-
-</body>
-
-</html>
+    </div>
+@endsection

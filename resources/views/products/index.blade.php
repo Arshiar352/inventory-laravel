@@ -1,91 +1,73 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>مدیریت محصولات</title>
-</head>
+@section('title', 'مدیریت محصولات')
 
-<body>
+@section('content')
+    <div class="card">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span>مدیریت محصولات انبار</span>
+            <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">ثبت محصول جدید</a>
+        </div>
 
-    <h1>مدیریت محصولات انبار</h1>
+        <div class="card-body p-4">
+            <form action="{{ route('products.index') }}" method="GET" class="row g-2 mb-4">
+                <div class="col-12 col-md-9">
+                    <input type="text" name="search" class="form-control"
+                        placeholder="نام محصول، شرکت سازنده یا نوع محصول..."
+                        value="{{ request('search') }}">
+                </div>
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">جستجو</button>
+                    <a href="{{ route('products.index') }}" class="btn btn-outline-light flex-fill">پاک کردن</a>
+                </div>
+            </form>
 
-    <a href="{{ route('products.create') }}">ثبت محصول جدید</a>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>نام محصول</th>
+                            <th>قیمت</th>
+                            <th>تعداد</th>
+                            <th>سازنده</th>
+                            <th>نوع محصول</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
 
-    <br><br>
+                    <tbody>
+                        @forelse ($products as $product)
+                            <tr>
+                                <td>{{ $product['name'] }}</td>
+                                <td>{{ $product['price'] }}</td>
+                                <td>{{ $product['quantity'] }}</td>
+                                <td>{{ $product['manufacturer'] }}</td>
+                                <td>{{ $product['type'] }}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('products.edit', $product['id']) }}"
+                                            class="btn btn-primary btn-sm px-3">ویرایش</a>
 
-    @if (session('success'))
-    <p>{{ session('success') }}</p>
-    @endif
-
-    <form action="{{ route('products.index') }}" method="GET">
-        <input
-            type="text"
-            name="search"
-            placeholder="نام محصول، شرکت سازنده یا نوع محصول..."
-            value="{{ request('search') }}">
-
-        <button type="submit">جستجو</button>
-
-        <a href="{{ route('products.index') }}">پاک کردن جستجو</a>
-    </form>
-
-    <table border="1" cellpadding="10">
-        <thead>
-            <tr>
-                <th>نام محصول</th>
-                <th>قیمت</th>
-                <th>تعداد</th>
-                <th>سازنده</th>
-                <th>نوع محصول</th>
-                <th>عملیات</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            @forelse ($products as $product)
-
-            <tr>
-                <td>{{ $product['name'] }}</td>
-                <td>{{ $product['price'] }}</td>
-                <td>{{ $product['quantity'] }}</td>
-                <td>{{ $product['manufacturer'] }}</td>
-                <td>{{ $product['type'] }}</td>
-
-                <td>
-                    <a href="{{ route('products.edit', $product['id']) }}">
-                        ویرایش
-                    </a>
-
-                    |
-
-                    <form
-                        action="{{ route('products.destroy', $product['id']) }}"
-                        method="POST"
-                        style="display: inline;"
-                        onsubmit="return confirm('آیا از حذف این محصول مطمئن هستید؟')">
-                        @csrf
-                        @method('DELETE')
-
-                        <button type="submit">حذف</button>
-                    </form>
-                </td>
-            </tr>
-
-            @empty
-
-            <tr>
-                <td colspan="6">
-                    هنوز محصولی ثبت نشده است.
-                </td>
-            </tr>
-
-            @endforelse
-
-        </tbody>
-    </table>
-
-</body>
-
-</html>
+                                        <form action="{{ route('products.destroy', $product['id']) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('آیا از حذف این محصول مطمئن هستید؟')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">حذف</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    هنوز محصولی ثبت نشده است.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+@endsection

@@ -1,61 +1,51 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>ویرایش محصول</title>
-</head>
+@section('title', 'ویرایش محصول')
 
-<body>
+@section('content')
+    <div class="card">
+        <div class="card-header">ویرایش محصول</div>
 
-    <h1>ویرایش محصول</h1>
+        <div class="card-body p-4">
+            <form action="{{ route('products.update', $product->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
-    <a href="{{ route('products.index') }}">بازگشت به لیست محصولات</a>
+                <div class="mb-3">
+                    <label for="name" class="form-label">نام محصول</label>
+                    <input id="name" type="text" name="name" class="form-control"
+                        value="{{ old('name', $product->name) }}" required>
+                </div>
 
-    <br><br>
+                <div class="mb-3">
+                    <label for="price" class="form-label">قیمت</label>
+                    <input id="price" type="number" name="price" class="form-control"
+                        min="0" step="0.01" value="{{ old('price', $product->price) }}" required>
+                </div>
 
-    @if ($errors->any())
-    <ul>
-        @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-    @endif
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">تعداد</label>
+                    <input id="quantity" type="number" name="quantity" class="form-control"
+                        min="0" step="1" value="{{ old('quantity', $product->quantity) }}" required>
+                </div>
 
-    <form action="{{ route('products.update', $product->id) }}" method="POST">
+                <div class="mb-3">
+                    <label for="manufacturer" class="form-label">سازنده</label>
+                    <input id="manufacturer" type="text" name="manufacturer" class="form-control"
+                        value="{{ old('manufacturer', $product->manufacturer) }}" required>
+                </div>
 
-        @csrf
-        @method('PUT')
+                <div class="mb-4">
+                    <label for="type" class="form-label">نوع محصول</label>
+                    <input id="type" type="text" name="type" class="form-control"
+                        value="{{ old('type', $product->type) }}" required>
+                </div>
 
-        <label>نام محصول:</label>
-        <input type="text" name="name"
-            value="{{ old('name', $product->name) }}">
-        <br><br>
-
-        <label>قیمت:</label>
-        <input type="number" name="price" min="0" step="0.01"
-            value="{{ old('price', $product->price) }}">
-        <br><br>
-
-        <label>تعداد:</label>
-        <input type="number" name="quantity" min="0" step="1"
-            value="{{ old('quantity', $product->quantity) }}">
-        <br><br>
-
-        <label>سازنده:</label>
-        <input type="text" name="manufacturer"
-            value="{{ old('manufacturer', $product->manufacturer) }}">
-        <br><br>
-
-        <label>نوع محصول:</label>
-        <input type="text" name="type"
-            value="{{ old('type', $product->type) }}">
-        <br><br>
-
-        <button type="submit">ذخیره تغییرات</button>
-
-    </form>
-
-</body>
-
-</html>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+                    <a href="{{ route('products.index') }}" class="btn btn-outline-light">بازگشت به لیست محصولات</a>
+                </div>
+            </form>
+        </div>
+    </div>
+@endsection
