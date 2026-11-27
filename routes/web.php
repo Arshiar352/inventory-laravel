@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\AuthController;
@@ -7,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WithdrawalController;
 
 
 Route::middleware('guest')->group(function () {
@@ -40,6 +40,11 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
+    Route::post('/products/{id}/withdraw', [WithdrawalController::class, 'store'])
+        ->whereNumber('id')
+        ->middleware('permission:withdraw products')
+        ->name('products.withdraw');
 
 
 
