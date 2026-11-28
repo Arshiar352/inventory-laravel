@@ -2,12 +2,11 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\NotificationController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WithdrawalController;
-
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
 
@@ -25,7 +24,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])
         ->name('register.create');
 });
-
 
 Route::middleware('auth')->group(function () {
 
@@ -46,19 +44,25 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:withdraw products')
         ->name('products.withdraw');
 
+    Route::get('/withdrawals', [WithdrawalController::class, 'index'])
+        ->middleware('permission:view withdrawal history')
+        ->name('withdrawals.index');
 
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])
+            ->name('users.index');
+
+        Route::patch('/users/{user}/admin', [UserController::class, 'grantAdmin'])
+            ->whereNumber('user')
+            ->name('users.grant-admin');
+    });
 
     Route::middleware('permission:view products')->group(function () {
 
         Route::get('/products', [ProductController::class, 'index'])
             ->name('products.index');
 
-        Route::get('/products/{id}', [ProductController::class, 'show'])
-            ->whereNumber('id')
-            ->name('products.show');
     });
-
-
 
     Route::middleware('role:admin')->group(function () {
 
@@ -75,8 +79,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/products/{id}', [ProductController::class, 'update'])
             ->whereNumber('id')
             ->name('products.update');
-    });
 
+        Route::patch('/products/{id}/status', [ProductController::class, 'toggleStatus'])
+            ->whereNumber('id')
+            ->middleware('permission:manage product status')
+            ->name('products.status');
+    });
 
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])
         ->name('notifications.read');

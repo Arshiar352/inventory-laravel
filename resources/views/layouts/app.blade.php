@@ -17,7 +17,12 @@
 
             <div class="navbar-nav flex-row align-items-center gap-3">
                 <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">خانه</a>
-                <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">محصولات</a>
+                @can('view products')
+                    <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">محصولات</a>
+                @endcan
+                @role('admin')
+                    <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">کاربران</a>
+                @endrole
                 <a class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}" href="{{ route('profile') }}">پروفایل</a>
 
                 <div class="dropdown">

@@ -16,6 +16,13 @@ class Product extends Model
         'is_active',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
+
     public function withdrawals(): HasMany
     {
         return $this->hasMany(Withdrawal::class);

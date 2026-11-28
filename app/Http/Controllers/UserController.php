@@ -3,14 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Hekmatinasser\Verta\Verta;
-use Illuminate\Support\Carbon;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $users = User::with('roles')->orderBy('id')->get();
+
+        return view('users.index', compact('users'));
+    }
+
+    public function grantAdmin(User $user)
+    {
+        if ($user->is(Auth::user())) {
+            return back()->withErrors([
+                'user' => 'نمی‌توانید نقش Admin را به حساب خودتان اعطا کنید.',
+            ]);
+        }
+
+        $user->syncRoles('admin');
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'نقش Admin به کاربر اعطا شد.');
+    }
+
     public function profile()
     {
         /** @var User $user */
@@ -33,7 +55,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'username' => 'required|unique:users,username,' . $user->id,
+            'username' => 'required|unique:users,username,'.$user->id,
             'birth_date' => 'required|jdate:Y/m/d',
             'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);

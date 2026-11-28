@@ -11,9 +11,7 @@ class ProductOutOfStockNotification extends Notification
 
     public function __construct(
         public string $productName
-    ) {
-        //
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

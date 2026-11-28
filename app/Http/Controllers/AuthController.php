@@ -7,10 +7,8 @@ use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class AuthController extends Controller
 {
-
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -25,7 +23,8 @@ class AuthController extends Controller
             $validated['birth_date']
         )->toCarbon()->format('Y-m-d');
 
-        User::create($validated);
+        $user = User::create($validated);
+        $user->assignRole('driver');
 
         return redirect()
             ->route('login')

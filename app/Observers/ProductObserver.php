@@ -3,21 +3,33 @@
 namespace App\Observers;
 
 use App\Models\Product;
-use App\Jobs\SendProductOutOfStockNotification;
+use App\Models\User;
+use App\Notifications\ProductOutOfStockNotification;
 
 class ProductObserver
 {
     public function created(Product $product): void
     {
         if ($product->quantity == 0) {
-            SendProductOutOfStockNotification::dispatch($product->id);
+            $this->notifyAdmins($product);
         }
     }
 
     public function updated(Product $product): void
     {
-        if ($product->wasChanged('quantity') && $product->quantity == 0) {
-            SendProductOutOfStockNotification::dispatch($product->id);
+        if (
+            $product->wasChanged('quantity')
+            && $product->getOriginal('quantity') > 0
+            && $product->quantity == 0
+        ) {
+            $this->notifyAdmins($product);
+        }
+    }
+
+    private function notifyAdmins(Product $product): void
+    {
+        foreach (User::role('admin')->get() as $admin) {
+            $admin->notify(new ProductOutOfStockNotification($product->name));
         }
     }
 

@@ -3,31 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
-
-
     public function index(Request $request)
     {
         $search = trim($request->input('search', ''));
 
-        $cacheKey = 'products_' . md5($search ?: 'all');
+        $userIsAdmin = $request->user()->hasRole('admin');
+        $cacheKey = 'products_'.($userIsAdmin ? 'admin_' : 'driver_').md5($search ?: 'all');
 
         $products = Cache::tags(['product'])->remember(
             $cacheKey,
             now()->addMinutes(5),
-            function () use ($search) {
+            function () use ($search, $userIsAdmin) {
 
                 $query = Product::query();
 
+                if (! $userIsAdmin) {
+                    $query->where('is_active', true);
+                }
+
                 if ($search !== '') {
                     $query->where(function ($query) use ($search) {
-                        $query->where('name', 'LIKE', '%' . $search . '%')
-                            ->orWhere('manufacturer', 'LIKE', '%' . $search . '%')
-                            ->orWhere('type', 'LIKE', '%' . $search . '%');
+                        $query->where('name', 'LIKE', '%'.$search.'%')
+                            ->orWhere('manufacturer', 'LIKE', '%'.$search.'%')
+                            ->orWhere('type', 'LIKE', '%'.$search.'%');
                     });
                 }
 
@@ -38,19 +41,10 @@ class ProductController extends Controller
         return view('products.index', compact('products'));
     }
 
-    public function show(int $id)
-    {
-        return 'Product ID: ' . $id;
-    }
-
-
-
     public function create()
     {
         return view('products.create');
     }
-
-
 
     public function store(Request $request)
     {
@@ -70,8 +64,6 @@ class ProductController extends Controller
             ->with('success', 'محصول با موفقیت ثبت شد.');
     }
 
-
-
     public function edit(int $id)
     {
         $product = Product::find($id);
@@ -82,8 +74,6 @@ class ProductController extends Controller
 
         return view('products.edit', compact('product'));
     }
-
-
 
     public function update(Request $request, int $id)
     {
@@ -109,9 +99,7 @@ class ProductController extends Controller
             ->with('success', 'محصول با موفقیت ویرایش شد.');
     }
 
-
-
-    public function destroy(int $id)
+    public function toggleStatus(int $id)
     {
         $product = Product::find($id);
 
@@ -119,11 +107,14 @@ class ProductController extends Controller
             abort(404);
         }
 
-        $product->delete();
+        $product->is_active = ! $product->is_active;
+        $product->save();
+
         Cache::tags(['product'])->flush();
 
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'محصول با موفقیت حذف شد.');
+        return back()->with(
+            'success',
+            $product->is_active ? 'محصول مجددا فعال شد.' : 'محصول غیرفعال شد.'
+        );
     }
 }
